@@ -2,6 +2,14 @@ import streamlit as st
 import openai
 import os
 
+import streamlit as st
+import openai
+import os
+import pickle
+import requests
+
+
+
 # Fetch OpenAI API key from Streamlit Secrets
 openai.api_base = "https://openrouter.ai/api/v1"
 openai.api_key = st.secrets["openai_api_key"]  # Access the secret key
