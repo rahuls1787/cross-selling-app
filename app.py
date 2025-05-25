@@ -5,6 +5,7 @@ import pickle
 import gdown
 import json
 import pandas as pd
+import joblib
 
 # Set OpenAI API base and key from secrets
 openai.api_base = "https://openrouter.ai/api/v1"
@@ -32,7 +33,7 @@ with open('ensemble_model.json', 'r') as f:
     model_config = json.load(f)
 
 with open('ensemble_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+    model = joblib.load(f)
 
 # UI Inputs
 gender = st.selectbox('Gender', ['Male', 'Female'])
