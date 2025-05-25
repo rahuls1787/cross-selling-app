@@ -2,11 +2,9 @@ import streamlit as st
 import openai
 import os
 import pickle
-import requests
 import gdown
 import json
 import pandas as pd
-import numpy as np
 
 # Set OpenAI API base and key from secrets
 openai.api_base = "https://openrouter.ai/api/v1"
@@ -15,23 +13,28 @@ openai.api_key = st.secrets["openai_api_key"]
 # Streamlit app title
 st.title('🚗 Cross-Selling Product Recommendation')
 
-# Function to download files from Google Drive
+# Function to download files from Google Drive using file ID
 def download_file_from_gdrive(file_id, output_path):
     if not os.path.exists(output_path):
-        url = f'https://drive.google.com/uc?id={file_id}'
+        url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, output_path, quiet=False)
 
-# Download and load model files
-download_file_from_gdrive('13H7zXyUJnBGLsRRpB3sfBJXlLRkyxkRM', 'ensemble_model.json')
-download_file_from_gdrive('1hoPMuou0Bqb6Ki0ih4geuw7-1Xig6kmY', 'ensemble_model.pkl')
+# Google Drive file IDs for model config and pickled model
+JSON_FILE_ID = "13H7zXyUJnBGLsRRpB3sfBJXlLRkyxkRM"
+PKL_FILE_ID = "1hoPMuou0Bqb6Ki0ih4geuw7-1Xig6kmY"
 
+# Download the files if not already present
+download_file_from_gdrive(JSON_FILE_ID, 'ensemble_model.json')
+download_file_from_gdrive(PKL_FILE_ID, 'ensemble_model.pkl')
+
+# Load model config and trained model
 with open('ensemble_model.json', 'r') as f:
     model_config = json.load(f)
 
 with open('ensemble_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-# User inputs
+# UI Inputs
 gender = st.selectbox('Gender', ['Male', 'Female'])
 age = st.number_input('Age', min_value=18, max_value=100, value=30)
 driving_license = st.selectbox('Driving License', ['Yes', 'No'])
@@ -43,10 +46,10 @@ annual_premium = st.number_input('Annual Premium', min_value=1000, max_value=100
 policy_sales_channel = st.number_input('Policy Sales Channel', min_value=1, max_value=200, value=10)
 vintage = st.number_input('Vintage', min_value=1, max_value=500, value=100)
 
-# Predict button
+# Prediction
 if st.button('Predict'):
     try:
-        # Categorical encoding
+        # Mapping categorical variables
         gender_map = {'Male': 1, 'Female': 0}
         yes_no_map = {'Yes': 1, 'No': 0}
         vehicle_age_map = {'< 1 Year': 0, '1-2 Years': 1, '> 2 Years': 2}
@@ -64,13 +67,13 @@ if st.button('Predict'):
             vintage
         ]], columns=model_config['features'])
 
-        # Model prediction
+        # Predict
         prediction = model.predict(input_data)[0]
         prediction_label = 'Interested' if prediction == 1 else 'Not Interested'
 
         st.markdown(f"### ✅ Prediction: **{prediction_label}**")
 
-        # Explanation prompt for OpenAI
+        # Prompt for explanation
         explanation_prompt = f"""
         The prediction for the insurance holder is '{prediction_label}'.
         Here are the details of the input data:
@@ -83,7 +86,7 @@ if st.button('Predict'):
         Explain why the insurance holder is predicted to be '{prediction_label}' based on the input data.
         """
 
-        # OpenAI call
+        # Call OpenAI to explain
         response = openai.ChatCompletion.create(
             model="openai/gpt-3.5-turbo",
             messages=[
