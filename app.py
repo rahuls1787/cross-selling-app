@@ -6,6 +6,10 @@ import gdown
 import json
 import pandas as pd
 import joblib
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+
 
 # Set OpenAI API base and key from secrets
 openai.api_base = "https://openrouter.ai/api/v1"
