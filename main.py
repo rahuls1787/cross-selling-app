@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -11,29 +11,8 @@ from lightgbm import LGBMClassifier
 from imblearn.over_sampling import SMOTE
 from imblearn.combine import SMOTEENN
 
-
-import gdown
-import os
-
-# Define Google Drive file URLs
-pkl_url = "https://drive.google.com/uc?id=1hoPMuou0Bqb6Ki0ih4geuw7-1Xig6kmY"
-json_url = "https://drive.google.com/uc?id=13H7zXyUJnBGLsRRpB3sfBJXlLRkyxkRM"
-
-# File names
-pkl_file = "ensemble_model.pkl"
-json_file = "ensemble_model.json"
-
-# Download if not present
-if not os.path.exists(pkl_file):
-    gdown.download(pkl_url, pkl_file, quiet=False)
-
-if not os.path.exists(json_file):
-    gdown.download(json_url, json_file, quiet=False)
-
-
-
 # Load the dataset
-df = pd.read_csv('C:/Users/Administrator/Desktop/Project_STI/dataset_insu.csv')
+df = pd.read_csv('C:/Users/Administrator/Desktop/dataset_insu.csv')
 
 # Data Preprocessing
 # Handle Missing Values
@@ -83,7 +62,6 @@ y_pred = (y_pred_proba >= best_threshold).astype(int)
 
 print(f'Best Threshold: {best_threshold}')
 print(classification_report(y_test, y_pred))
-
 
 import joblib
 
